@@ -1,7 +1,8 @@
 import { Controller, Get } from '@nestjs/common'
-import { ApiOperation } from '@nestjs/swagger'
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger'
 
 import { AppService } from './app.service'
+import { HealthResponse } from './dto'
 
 @Controller()
 export class AppController {
@@ -19,6 +20,9 @@ export class AppController {
 	@ApiOperation({
 		summary: 'Health Check endpoint',
 		description: 'Returns the health status of the service'
+	})
+	@ApiOkResponse({
+		type: HealthResponse
 	})
 	@Get('health')
 	healthCheck() {
