@@ -1,0 +1,46 @@
+import { Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { NestFactory } from '@nestjs/core'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+
+import { AppModule } from './core/app.module'
+
+async function bootstrap() {
+	const app = await NestFactory.create(AppModule)
+
+	const config = app.get(ConfigService)
+	const logger = new Logger('Gateway')
+
+	app.enableCors({
+		origin: config.getOrThrow<string>('HTTP_CORS').split(','),
+		credentials: true
+	})
+
+	const swaggerConfig = new DocumentBuilder()
+		.setTitle('BeetCinema Gateway API')
+		.setDescription(
+			'API documentation for the Gateway service of BeetCinema platform microservices'
+		)
+		.setVersion('1.0.0')
+		.addBearerAuth()
+		.build()
+
+	const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig)
+
+	SwaggerModule.setup('/docs', app, swaggerDocument, {
+		yamlDocumentUrl: '/openapi.yaml'
+	})
+
+	const port = config.getOrThrow<number>('HTTP_PORT')
+	const host = config.getOrThrow<string>('HTTP_HOST')
+
+	await app.listen(port)
+
+	logger.log('-------------------------------------------------------------')
+	logger.log(`🚀Gateway service is running on: http://${host}`)
+	logger.log('-------------------------------------------------------------')
+
+	logger.log(`📚Swagger UI available on: http://${host}/docs`)
+	logger.log('-------------------------------------------------------------')
+}
+bootstrap()
