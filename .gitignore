@@ -43,4 +43,5 @@ coverage/
 
 # ===== Misc =====
 core/
+contracts/
 !gateway-service/src/core
